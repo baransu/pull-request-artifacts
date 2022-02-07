@@ -59,54 +59,54 @@ async function run(): Promise<void> {
     core.info(`Artifacts repo: ${artifacts_owner}/${artifacts_repo}`)
     core.info(`Artifacts branch: ${artifacts_branch}`)
 
-    const findComment = async (body: string): Promise<number | null> => {
-      const comments = await local_octokit.rest.issues.listComments({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        issue_number: context.issue.number
-      })
+    // const findComment = async (body: string): Promise<number | null> => {
+    //   const comments = await local_octokit.rest.issues.listComments({
+    //     owner: context.repo.owner,
+    //     repo: context.repo.repo,
+    //     issue_number: context.issue.number
+    //   })
 
-      for (let i = 0; i < comments.data.length; i++) {
-        const comment = comments.data[i]
+    //   for (let i = 0; i < comments.data.length; i++) {
+    //     const comment = comments.data[i]
 
-        if (!comment.user || comment.user.login != 'github-actions[bot]') {
-          continue
-        }
+    //     if (!comment.user || comment.user.login != 'github-actions[bot]') {
+    //       continue
+    //     }
 
-        if (!comment.body || !comment.body.includes(body)) {
-          continue
-        }
+    //     if (!comment.body || !comment.body.includes(body)) {
+    //       continue
+    //     }
 
-        return comment.id
-      }
+    //     return comment.id
+    //   }
 
-      return null
-    }
+    //   return null
+    // }
 
-    const updateComment = async (
-      comment_id: number,
-      body: string
-    ): Promise<void> => {
-      core.info(`Updating comment ${comment_id}`)
+    // const updateComment = async (
+    //   comment_id: number,
+    //   body: string
+    // ): Promise<void> => {
+    //   core.info(`Updating comment ${comment_id}`)
 
-      await local_octokit.rest.issues.updateComment({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        comment_id: comment_id,
-        body
-      })
-    }
+    //   await local_octokit.rest.issues.updateComment({
+    //     owner: context.repo.owner,
+    //     repo: context.repo.repo,
+    //     comment_id: comment_id,
+    //     body
+    //   })
+    // }
 
-    const createComment = async (body: string): Promise<void> => {
-      core.info(`Posting new comment`)
+    // const createComment = async (body: string): Promise<void> => {
+    //   core.info(`Posting new comment`)
 
-      await local_octokit.rest.issues.createComment({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        issue_number: context.issue.number,
-        body
-      })
-    }
+    //   await local_octokit.rest.issues.createComment({
+    //     owner: context.repo.owner,
+    //     repo: context.repo.repo,
+    //     issue_number: context.issue.number,
+    //     body
+    //   })
+    // }
 
     const findFileSha = async (
       filename: string
