@@ -28,16 +28,6 @@ async function run(): Promise<void> {
       )
     }
 
-    const local_octokit = new Octokit({
-      auth: local_token,
-      log: {
-        debug: core.debug,
-        info: core.info,
-        warn: core.warning,
-        error: core.error
-      }
-    })
-
     const artifacts_octokit = new Octokit({
       auth: artifacts_token,
       log: {
@@ -58,55 +48,6 @@ async function run(): Promise<void> {
 
     core.info(`Artifacts repo: ${artifacts_owner}/${artifacts_repo}`)
     core.info(`Artifacts branch: ${artifacts_branch}`)
-
-    // const findComment = async (body: string): Promise<number | null> => {
-    //   const comments = await local_octokit.rest.issues.listComments({
-    //     owner: context.repo.owner,
-    //     repo: context.repo.repo,
-    //     issue_number: context.issue.number
-    //   })
-
-    //   for (let i = 0; i < comments.data.length; i++) {
-    //     const comment = comments.data[i]
-
-    //     if (!comment.user || comment.user.login != 'github-actions[bot]') {
-    //       continue
-    //     }
-
-    //     if (!comment.body || !comment.body.includes(body)) {
-    //       continue
-    //     }
-
-    //     return comment.id
-    //   }
-
-    //   return null
-    // }
-
-    // const updateComment = async (
-    //   comment_id: number,
-    //   body: string
-    // ): Promise<void> => {
-    //   core.info(`Updating comment ${comment_id}`)
-
-    //   await local_octokit.rest.issues.updateComment({
-    //     owner: context.repo.owner,
-    //     repo: context.repo.repo,
-    //     comment_id: comment_id,
-    //     body
-    //   })
-    // }
-
-    // const createComment = async (body: string): Promise<void> => {
-    //   core.info(`Posting new comment`)
-
-    //   await local_octokit.rest.issues.createComment({
-    //     owner: context.repo.owner,
-    //     repo: context.repo.repo,
-    //     issue_number: context.issue.number,
-    //     body
-    //   })
-    // }
 
     const findFileSha = async (
       filename: string
@@ -170,12 +111,6 @@ Commit: ${repo_url}/commit/${commit_sha}
       return `${artifacts_repo_url}/blob/${artifacts_branch}/${file_path}?raw=true`
     }
 
-    const title = 'Pull request artifacts'
-    let body = `## 🤖 ${title}
-| file | commit |
-| ---- | ------ |
-`
-
     for (let artifact of artifact_list.split(/\s+/)) {
       const path = artifact.trim()
 
@@ -183,18 +118,8 @@ Commit: ${repo_url}/commit/${commit_sha}
       const content = fs.readFileSync(path)
 
       const target_name = `pr${context.issue.number}-${basename}`
-      const target_link = await uploadFile(target_name, content)
-
-      body += `| [\`${target_name}\`](${target_link}) | ${commit_sha} |`
-      body += '\n'
+      await uploadFile(target_name, content)
     }
-
-    // const comment_id = await findComment(title)
-    // if (comment_id) {
-    //     await updateComment(comment_id, body)
-    // } else {
-    //     await createComment(body)
-    // }
   } catch (error) {
     core.setFailed(error.message)
   }
